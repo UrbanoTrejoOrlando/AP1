@@ -9,7 +9,8 @@ const userRouter = require("./routes/userRoutes");
 // Importacion dotenv
 require("dotenv").config();
 // Definicion del puerto 
-const PORT = process.env.PORT
+// En tu index.js
+const PORT = process.env.PORT || 3006; // Fallback a 3006 si no hay PORT definido
 
 // Creacion de la instancia del servidor
 const app = express();
@@ -20,7 +21,16 @@ app.use('/api-1-user',userRouter);
 //Agregar la conexion a la base de datos
 ConnectDB();
 
-// Ejecucion del servidor
-app.listen(PORT, ()=>{
-    console.log("Server running in http://localhost:"+PORT)
+// En tu index.js
+const server = app.listen(PORT, "0.0.0.0", () => {
+    console.log("Server running on port " + PORT);
+});
+
+// Manejo de señales de terminación
+process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    server.close(() => {
+        console.log('Process terminated');
+        process.exit(0);
+    });
 });
